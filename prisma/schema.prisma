@@ -1,0 +1,65 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Tool {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String   @unique
+  logo        String
+  bio         String
+  likes       Int?
+  rating      Float?
+  url         String
+  description String
+  category    String
+  price       String?
+  approved    String   @default("pending")
+  userEmail   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  User        User     @relation(fields: [userEmail], references: [email], onDelete: Cascade) // Updated relation
+  Reviews     Review[]
+}
+
+model User {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  email          String   @unique
+  hashedPassword String
+  name           String?
+  phone          String?
+  emailVarified  Boolean  @default(false)
+  address        String?
+  bio            String?
+  website        String?
+  image          String?
+  subscribed     Boolean?
+  feautured      Boolean?
+  role           Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  tools          Tool[]
+  Reviews        Review[]
+}
+
+model Review {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  userId    String   @db.ObjectId
+  toolId    String   @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Tool      Tool     @relation(fields: [toolId], references: [id])
+  User      User     @relation(fields: [userId], references: [id])
+}
+
+model Newsletter {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
